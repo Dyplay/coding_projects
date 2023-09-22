@@ -12,7 +12,7 @@ const config: DocsThemeConfig = {
   chat: {
     link: 'https://discord.gg/dyplay',
   },
-  docsRepositoryBase: 'https://github.com/shuding/nextra-docs-template',
+  docsRepositoryBase: 'https://github.com/dyplay/coding_projects',
   footer: {
     text: 'Made with ❤️ by Dyplay 2023© & Next.js Vercel',
   },
