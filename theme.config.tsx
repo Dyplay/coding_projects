@@ -1,8 +1,11 @@
 import React from 'react'
 import { DocsThemeConfig } from 'nextra-theme-docs'
+// Images
+import icon from './components/icon.png'
+//
 
 const config: DocsThemeConfig = {
-  logo: <span>✨ Coding Projects</span>,
+  logo: <span>Coding Projects</span>,
   project: {
     link: 'https://github.com/dyplay',
   },
@@ -11,7 +14,7 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/shuding/nextra-docs-template',
   footer: {
-    text: 'Nextra Docs Template',
+    text: 'Made with ❤️ by Dyplay 2023©',
   },
 }
 

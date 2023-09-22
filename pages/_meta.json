@@ -1,15 +1,19 @@
 {
-  "index": "Introduction",
-  "another": "Another Page",
-  "advanced": "Advanced",
+  "index": "Introduction Website",
+  "Vuejs_Projects": "Vue.js Projects",
+  "cpp": "C++",
   "about": {
     "title": "About",
+    "type": "page"
+  },
+  "collaboration": {
+    "title": "Collaboration",
     "type": "page"
   },
   "contact": {
     "title": "Contact ↗",
     "type": "page",
-    "href": "https://twitter.com/shuding_",
+    "href": "https://twitter.com/dyplayr",
     "newWindow": true
   }
 }
