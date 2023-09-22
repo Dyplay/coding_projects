@@ -14,7 +14,7 @@ const config: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/shuding/nextra-docs-template',
   footer: {
-    text: 'Made with ❤️ by Dyplay 2023©',
+    text: 'Made with ❤️ by Dyplay 2023© & Next.js Vercel',
   },
 }
 
