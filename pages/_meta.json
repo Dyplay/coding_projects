@@ -2,6 +2,7 @@
   "index": "Introduction Website",
   "Vuejs_Projects": "Vue.js Projects",
   "cpp": "C++",
+  "nextjs": "Next.js",
   "about": {
     "title": "About",
     "type": "page"

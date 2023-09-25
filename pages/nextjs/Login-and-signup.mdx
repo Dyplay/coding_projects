@@ -1,0 +1,235 @@
+---
+title: MongoDB Login & Sign Up Next.js
+---
+
+# MongoDB Login with Next.js Documentation
+
+This documentation explains the code for implementing MongoDB-based user authentication in a Next.js application.
+
+## Introduction
+
+This code is a Next.js API route that handles user login using MongoDB as the database. It validates the user's credentials and sets a session cookie upon successful login.
+
+## Dependencies
+
+- `Cookies`: This code uses the `cookies` library to manage cookies.
+- `clientPromise`: This is a MongoDB client promise used to establish a connection to the MongoDB database.
+- `createHash`: Imported from the `node:crypto` module for hashing the user's password.
+
+## SourceCode
+GitHub: https://github.com/Dyplay/login-signup-nextjsv2
+
+## Code Explanation
+
+
+### Login.js
+The code is structured as an asynchronous handler function that listens for HTTP POST requests. It follows these steps:
+
+```javascript filename="login.js" copy
+import Cookies from 'cookies'
+import clientPromise from "../../lib/mongodb";
+const {createHash} = require('node:crypto');
+
+export default async function handler(req, res) {
+  if (req.method == "POST") {
+    // Handle login logic
+  } else {
+    // Redirect to the home page if it's not a POST request
+  }
+}
+```
+Extract the `username` and `password` from the request body.
+
+```javascript filename="login.js" copy
+const username = req.body['username'];
+const guess = req.body['password'];
+```
+
+Establish a connection to the MongoDB database and retrieve the user's profile based on the provided username.
+
+```javascript filename="login.js" copy
+const client = await clientPromise;
+const db = client.db("Users");
+const users = await db.collection("Profiles").find({"Username": username}).toArray();
+```
+
+Check if a user with the given username exists. If not, redirect to the login page with an error message.
+
+```javascript filename="login.js" copy
+if (users.length == 0) {
+  res.redirect("/login?msg=Incorrect username or password");
+  return;
+}
+```
+
+Retrieve the user's profile from the database.
+
+```javascript filename="login.js" copy
+const user = users[0];
+```
+
+Hash the provided password and compare it to the stored hashed password.
+
+```javascript filename="login.js" copy
+const guess_hash = createHash('sha256').update(guess).digest('hex');
+if (guess_hash == user.Password) {
+  // Successful login: Set a cookie and redirect to the home page
+  const cookies = new Cookies(req, res);
+  cookies.set('username', username);
+  res.redirect("/");
+} else {
+  // Incorrect password: Redirect to the login page with an error message
+  res.redirect("/login?msg=Incorrect username or password");
+}
+```
+
+If the request method is not POST, redirect to the home page.
+
+```javascript filename="login.js" copy
+} else {
+  res.redirect("/");
+}
+```
+
+### Signup.js
+
+The code is structured as an asynchronous handler function that listens for HTTP POST requests. It follows these steps:
+
+```javascript filename="signup.js" copy
+import Cookies from 'cookies'
+import clientPromise from "../../lib/mongodb";
+const {createHash} = require('node:crypto');
+
+export default async function handler(req, res) {
+  if (req.method == "POST") {
+    // Handle registration logic
+  } else {
+    // Redirect to the home page if it's not a POST request
+  }
+}
+```
+
+Check if the HTTP request method is POST.
+
+```javascript filename="signup.js" copy
+if (req.method == "POST") {
+  // Handle registration logic
+} else {
+  // Redirect to the home page if it's not a POST request
+}
+```
+
+Extract the `username`, `password`, and `passwordagain` from the request body.
+
+```javascript filename="signup.js" copy
+const username = req.body['username'];
+const password = req.body['password'];
+const passwordagain = req.body['passwordagain'];
+```
+
+Check if the `password` matches the `passwordagain`. If not, redirect to the sign-up page with an error message.
+
+```javascript filename="signup.js" copy
+if (password != passwordagain) {
+  res.redirect("/signup?msg=The two passwords don't match");
+  return;
+}
+```
+
+Establish a connection to the MongoDB database and check if a user with the provided `username` already exists.
+
+```javascript filename="signup.js" copy
+const client = await clientPromise;
+const db = client.db("Users");
+const users = await db.collection("Profiles").find({"Username": username}).toArray();
+```
+
+If a user with the same `username` already exists, redirect to the sign-up page with an error message.
+
+```javascript filename="signup.js" copy
+if (users.length > 0) {
+  res.redirect("/signup?msg=A user already has this username");
+  return;
+}
+```
+
+Hash the provided `password` and store the user's information in the database, including the current date.
+
+```javascript filename="signup.js" copy
+const password_hash = createHash('sha256').update(password).digest('hex');
+const currentDate = new Date().toUTCString();
+const bodyObject = {
+    Username: username,
+    Password: password_hash,
+    Created: currentDate
+}
+await db.collection("Profiles").insertOne(bodyObject);
+```
+
+Set a session cookie with the `username` and redirect to the home page upon successful registration.
+
+```javascript filename="signup.js" copy
+const cookies = new Cookies(req, res)
+cookies.set('username', username)
+res.redirect("/")
+```
+
+If the request method is not POST, redirect to the home page.
+
+```javascript filename="signup.js" copy
+} else {
+  res.redirect("/");
+}
+```
+
+### Logout.js
+
+The code is structured as an asynchronous handler function that listens for HTTP GET requests. It follows these steps:
+
+```javascript filename="logout.js" copy
+import Cookies from 'cookies'
+
+export default async function handler(req, res) {
+  if (req.method == "GET") {
+    // Handle logout logic
+  } else {
+    // Redirect to the home page if it's not a GET request
+  }
+}
+```
+
+Check if the HTTP request method is GET.
+
+```javascript filename="logout.js" copy
+if (req.method == "GET") {
+  // Handle logout logic
+} else {
+  // Redirect to the home page if it's not a GET request
+}
+```
+
+Create a new `Cookies` instance to manage cookies.
+
+```javascript filename="logout.js" copy
+const cookies = new Cookies(req, res)
+```
+
+Clear the session cookie by calling `cookies.set('username')` without providing a value. This effectively removes the `username` cookie.
+
+```javascript filename="logout.js" copy
+cookies.set('username')
+```
+
+Redirect the user to the home page after successfully logging out.
+
+```javascript filename="logout.js" copy
+res.redirect("/")
+```
+
+If the request method is not GET, redirect to the home page.
+
+```javascript filename="logout.js" copy
+} else {
+  res.redirect("/");
+}
+```
