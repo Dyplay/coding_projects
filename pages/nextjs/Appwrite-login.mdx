@@ -1,0 +1,143 @@
+Certainly! Here's the entire MDX document in a single code block for easy copying:
+
+```mdx
+# Creating a Login System with Appwrite in Next.js
+
+Next.js and Appwrite provide a powerful combination for building full-stack applications with robust authentication. This guide will walk you through the process of implementing a login system using Appwrite in a Next.js application.
+
+## Setting Up the Project
+
+First, ensure you have Next.js and Appwrite dependencies installed in your project:
+
+```
+npm install next react react-dom node-appwrite
+```
+
+## Configuring Appwrite
+
+Create a file named `appwrite.js` in your project's `src/lib` directory to set up the Appwrite client:
+
+```
+import { Client, Account } from 'node-appwrite';
+
+export function createAdminClient() {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID)
+    .setKey(process.env.APPWRITE_API_KEY);
+
+  return {
+    account: new Account(client)
+  };
+}
+
+export function createSessionClient(cookies) {
+  const client = new Client()
+    .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT)
+    .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID);
+
+  if (cookies.get('my-custom-session')) {
+    client.setJWT(cookies.get('my-custom-session').value);
+  }
+
+  return {
+    account: new Account(client)
+  };
+}
+```
+
+## Creating the Login Page
+
+Create a new file `app/login/page.jsx` for the login page:
+
+```
+import { createAdminClient } from "@/lib/appwrite";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+
+async function loginWithEmail(formData) {
+  "use server";
+  const email = formData.get("email");
+  const password = formData.get("password");
+
+  const { account } = createAdminClient();
+  
+  try {
+    const session = await account.createEmailSession(email, password);
+    cookies().set("my-custom-session", session.secret, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+    });
+    redirect("/dashboard");
+  } catch (error) {
+    console.error("Login failed:", error);
+    // Handle login error (e.g., show error message to user)
+  }
+}
+
+export default function LoginPage() {
+  return (
+    <div>
+      <h1>Login</h1>
+      <form action={loginWithEmail}>
+        <input name="email" type="email" placeholder="Email" required />
+        <input name="password" type="password" placeholder="Password" required />
+        <button type="submit">Log in</button>
+      </form>
+    </div>
+  );
+}
+```
+
+## Protecting Routes
+
+To protect routes and ensure only authenticated users can access them, create a utility function in `src/lib/auth.js`:
+
+```
+import { createSessionClient } from './appwrite';
+import { cookies } from 'next/headers';
+
+export async function getSession() {
+  const { account } = createSessionClient(cookies());
+  
+  try {
+    return await account.get();
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function requireAuth() {
+  const session = await getSession();
+  if (!session) {
+    redirect('/login');
+  }
+  return session;
+}
+```
+
+Now you can use the `requireAuth` function in your protected routes:
+
+```
+import { requireAuth } from '@/lib/auth';
+
+export default async function DashboardPage() {
+  const session = await requireAuth();
+  
+  return (
+    <div>
+      <h1>Welcome to your dashboard, {session.name}!</h1>
+      {/* Dashboard content */}
+    </div>
+  );
+}
+```
+
+## Conclusion
+
+This guide demonstrates how to implement a basic login system using Appwrite in a Next.js application. Remember to handle error cases, implement logout functionality, and consider adding features like password reset and email verification for a more robust authentication system.
+```
+
+This MDX document provides a comprehensive guide on creating a login system with Appwrite in Next.js, including project setup, Appwrite configuration, creating a login page, and protecting routes. You can now easily copy and use this content in your project.
